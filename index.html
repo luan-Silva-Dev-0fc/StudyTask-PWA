@@ -5,23 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StudyTask</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#4f46e5" />
   <meta property="og:title" content="StudyTask - Organize Seus Estudos!" />
   <meta property="og:description" content="🚀 StudyTask: o app perfeito para gerenciar suas tarefas de estudo! Com lembretes, listas personalizadas e suporte offline, potencializado pela IA Oráculo, ele maximiza sua produtividade. Baixe agora! 📚" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/" />
   <meta property="og:image" content="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/path/to/preview-image.jpg" />
   <meta property="og:image:alt" content="Logo do StudyTask" />
-  <!-- Fim dos metadados Open Graph -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    /* Reset e Configurações Gerais */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #6366f1;
+      --secondary: #6b7280;
+      --secondary-hover: #9ca3af;
+      --background-dark: #0f172a;
+      --background-light: #f8fafc;
+      --text-dark: #f1f5f9;
+      --text-light: #1e293b;
+      --text-secondary-dark: #94a3b8;
+      --text-secondary-light: #64748b;
+      --modal-bg-dark: rgba(15, 23, 42, 0.95);
+      --modal-bg-light: rgba(248, 250, 252, 0.95);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+      --error: #ef4444;
+      --ban-button: #000000;
+      --ban-button-hover: #1f1f1f;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #121212, #1e1e1e);
+      font-family: 'Inter', sans-serif;
+      background: var(--background-dark);
+      color: var(--text-dark);
       overflow: hidden;
-      color: #eee;
+      transition: var(--transition);
+    }
+
+    @media (prefers-color-scheme: light) {
+      html, body {
+        background: var(--background-light);
+        color: var(--text-light);
+      }
+      #modalInstall, #offlineScreen .box, #banReasonModal {
+        background: var(--modal-bg-light);
+        color: var(--text-light);
+      }
+      #modalInstall p, #offlineScreen p, #banReasonModal p {
+        color: var(--text-secondary-light);
+      }
     }
 
     iframe {
@@ -31,36 +68,35 @@
       display: block;
     }
 
-    /* ANIMAÇÃO DE GRADIENTE */
+    /* Animação de Gradiente */
     @keyframes backgroundGradient {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    /* Modal de Abertura com Vídeo */
+    /* Splash Screen */
     #splashScreen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(20, 20, 20, 0.95);
+      background: var(--background-dark);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10001;
-      animation: fadeIn 0.5s ease;
+      animation: fadeIn 0.6s ease-out;
     }
 
     #splashScreen video {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover; /* Garante que o vídeo cubra a tela sem distorção */
-      object-position: center; /* Centraliza o conteúdo do vídeo */
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.8);
+      transition: filter var(--transition);
     }
 
     /* Modal de Instalação */
@@ -69,62 +105,65 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(20, 20, 20, 0.9);
-      backdrop-filter: blur(8px);
-      border-radius: 16px;
+      background: var(--modal-bg-dark);
+      backdrop-filter: blur(12px);
+      border-radius: var(--border-radius);
       padding: 24px;
       max-width: 90vw;
-      width: 100%;
-      max-width: 400px;
+      width: 400px;
       text-align: center;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow);
       z-index: 10000;
       display: none;
       flex-direction: column;
       gap: 16px;
-      animation: fadeIn 0.5s ease;
+      animation: fadeIn 0.6s ease-out;
     }
 
     #modalInstall h2 {
-      font-size: 5vw;
-      color: #ffffff;
-      margin: 0;
+      font-size: 1.5rem;
       font-weight: 600;
+      margin: 0;
+      color: var(--text-dark);
     }
 
     #modalInstall p {
-      font-size: 4vw;
-      color: #cccccc;
-      margin: 8px 0 16px;
+      font-size: 0.875rem;
+      color: var(--text-secondary-dark);
+      margin: 8px 0;
+      line-height: 1.5;
     }
 
     #modalInstall button {
-      padding: 12px 24px;
+      padding: 10px 20px;
       border: none;
       border-radius: 8px;
-      font-size: 4vw;
+      font-size: 0.875rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
+      transition: var(--transition);
     }
 
     #instalar {
-      background: #6200ea;
-      color: #ffffff;
+      background: var(--primary);
+      color: #fff;
     }
 
     #instalar:hover {
-      background: #7f39fb;
+      background: var(--primary-hover);
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
 
     #ficar {
-      background: #333;
-      color: #ffffff;
+      background: var(--secondary);
+      color: #fff;
     }
 
     #ficar:hover {
-      background: #444;
+      background: var(--secondary-hover);
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
     }
 
     /* Modal Offline */
@@ -134,9 +173,9 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: linear-gradient(-45deg, #0f0f0f, #1a1a1a, #2a2a2a, #111111);
+      background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
       background-size: 400% 400%;
-      animation: backgroundGradient 10s ease infinite;
+      animation: backgroundGradient 15s ease infinite;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -144,79 +183,217 @@
     }
 
     #offlineScreen .box {
-      background: rgba(20, 20, 20, 0.9);
-      backdrop-filter: blur(8px);
-      border-radius: 16px;
+      background: var(--modal-bg-dark);
+      backdrop-filter: blur(12px);
+      border-radius: var(--border-radius);
       padding: 24px;
       max-width: 90vw;
-      width: 100%;
-      max-width: 400px;
+      width: 400px;
       text-align: center;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      animation: fadeIn 0.5s ease;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.6s ease-out;
     }
 
     #offlineScreen h1 {
-      font-size: 5vw;
-      color: #ffffff;
-      margin: 0 0 12px;
+      font-size: 1.5rem;
       font-weight: 600;
+      margin: 0 0 8px;
+      color: var(--text-dark);
     }
 
     #offlineScreen p {
-      font-size: 4vw;
-      color: #cccccc;
+      font-size: 0.875rem;
+      color: var(--text-secondary-dark);
       margin: 0;
+      line-height: 1.5;
     }
 
-    /* Fade in animation */
+    /* Modal de Motivos do Banimento */
+    #banReasonModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--modal-bg-dark);
+      backdrop-filter: blur(12px);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      max-width: 90vw;
+      width: 400px;
+      text-align: left;
+      box-shadow: var(--shadow);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    #banReasonModal h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--error);
+    }
+
+    #banReasonModal p {
+      font-size: 0.875rem;
+      color: var(--text-secondary-dark);
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+
+    #banReasonModal ul {
+      list-style-type: disc;
+      padding-left: 20px;
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-dark);
+    }
+
+    #banReasonModal ul li {
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: slideInItem 0.5s ease-out forwards;
+      animation-delay: calc(var(--index) * 0.1s);
+    }
+
+    #banReasonModal a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    #banReasonModal a:hover {
+      text-decoration: underline;
+    }
+
+    #banReasonModal button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      align-self: center;
+      background: var(--ban-button);
+      color: #fff;
+    }
+
+    #banReasonModal button:hover {
+      background: var(--ban-button-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Animações */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
 
+    @keyframes slideIn {
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    @keyframes slideInItem {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
     /* Responsividade */
     @media (min-width: 600px) {
-      #modalInstall h2 { font-size: 24px; }
-      #modalInstall p { font-size: 16px; }
-      #modalInstall button { font-size: 16px; padding: 12px 32px; }
-
-      #offlineScreen h1 { font-size: 24px; }
-      #offlineScreen p { font-size: 16px; }
-      #offlineScreen .box { padding: 32px; max-width: 500px; }
+      #modalInstall, #offlineScreen .box, #banReasonModal {
+        padding: 32px;
+        width: 450px;
+      }
+      #modalInstall h2, #offlineScreen h1, #banReasonModal h2 {
+        font-size: 1.75rem;
+      }
+      #modalInstall p, #offlineScreen p, #banReasonModal p, #banReasonModal ul {
+        font-size: 1rem;
+      }
+      #modalInstall button, #banReasonModal button {
+        padding: 12px 24px;
+        font-size: 1rem;
+      }
     }
 
     @media (max-width: 400px) {
-      #modalInstall h2 { font-size: 6vw; }
-      #modalInstall p { font-size: 4.5vw; }
-      #modalInstall button { font-size: 4.5vw; padding: 10px 20px; }
+      #modalInstall, #offlineScreen .box, #banReasonModal {
+        padding: 20px;
+        width: 90%;
+      }
+      #modalInstall h2, #offlineScreen h1, #banReasonModal h2 {
+        font-size: 1.25rem;
+      }
+      #modalInstall p, #offlineScreen p, #banReasonModal p, #banReasonModal ul {
+        font-size: 0.75rem;
+      }
+      #modalInstall button, #banReasonModal button {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+      }
+    }
 
-      #offlineScreen h1 { font-size: 6vw; }
-      #offlineScreen p { font-size: 4.5vw; }
+    /* Acessibilidade */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    button:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    #modalInstall, #offlineScreen, #banReasonModal {
+      role: "dialog";
+      aria-labelledby: "modalTitle";
     }
   </style>
 </head>
 <body>
   <!-- Modal de Abertura com Vídeo -->
-  <div id="splashScreen">
+  <div id="splashScreen" aria-hidden="true">
     <video autoplay muted playsinline>
       <source src="splash.mp4" type="video/mp4" />
       Seu navegador não suporta vídeos.
     </video>
   </div>
 
-  <div id="modalInstall">
-    <h2>Deseja instalar o aplicativo?</h2>
+  <!-- Modal de Instalação -->
+  <div id="modalInstall" role="dialog" aria-labelledby="modalInstallTitle">
+    <h2 id="modalInstallTitle">Deseja instalar o aplicativo?</h2>
     <p>Você poderá acessar direto da tela inicial.</p>
-    <button id="instalar">Instalar</button>
-    <button id="ficar">Ficar na Web</button>
+    <button id="instalar" aria-label="Instalar o aplicativo">Instalar</button>
+    <button id="ficar" aria-label="Continuar na versão web">Ficar na Web</button>
   </div>
 
-  <div id="offlineScreen">
+  <!-- Modal Offline -->
+  <div id="offlineScreen" role="dialog" aria-labelledby="offlineTitle">
     <div class="box">
-      <h1>Sem conexão com a internet</h1>
+      <h2 id="offlineTitle">Sem conexão com a internet</h2>
       <p>Ative seus dados móveis ou conecte-se ao Wi-Fi para continuar usando o app.</p>
     </div>
+  </div>
+
+  <!-- Modal de Motivos do Banimento -->
+  <div id="banReasonModal" role="dialog" aria-labelledby="banReasonTitle">
+    <h2 id="banReasonTitle">Conta Banida</h2>
+    <p>Sua conta foi banida por violar as regras da plataforma. As violações incluem comportamento inadequado, uso indevido de recursos ou violação dos termos de uso.</p>
+    <button id="showBanReasons" aria-label="Ver motivos do banimento">Ver Motivos</button>
+    <ul id="banReasonsList" style="display: none;">
+      <li style="--index: 1;">Comportamento inadequado ou desrespeitoso com outros usuários.</li>
+      <li style="--index: 2;">Uso de linguagem ofensiva, incluindo xingamentos ou palavrões.</li>
+      <li style="--index: 3;">Violação das diretrizes da comunidade da plataforma.</li>
+    </ul>
+    <p>Para mais informações ou para apelar, entre em contato com o suporte em: <a href="mailto:luansilva8521@outlook.com.br">luansilva8521@outlook.com.br</a>.</p>
   </div>
 
   <iframe id="mainFrame" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture" src="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/"></iframe>
@@ -225,37 +402,35 @@
     // Lógica do Splash Screen
     function showSplashScreen() {
       const video = document.querySelector('#splashScreen video');
-      // Mostrar o splash screen
       document.getElementById('splashScreen').style.display = 'flex';
-      // Ocultar outros elementos durante o splash
       document.getElementById('mainFrame').style.display = 'none';
       document.getElementById('offlineScreen').style.display = 'none';
       document.getElementById('modalInstall').style.display = 'none';
+      document.getElementById('banReasonModal').style.display = 'none';
 
-      // Aguardar o vídeo terminar ou 5 segundos (o que for menor)
       video.addEventListener('ended', () => {
         document.getElementById('splashScreen').style.display = 'none';
         sessionStorage.setItem('splashShown', 'true');
-        // Restaurar visibilidade com base no estado da conexão
         updateConnectionStatus();
-        // Verificar se deve mostrar o modal de instalação
         if (!localStorage.getItem('pwaDismissed') && deferredPrompt) {
           document.getElementById('modalInstall').style.display = 'flex';
+        } else {
+          document.getElementById('banReasonModal').style.display = 'flex';
         }
       });
 
-      // Fallback: ocultar após 5 segundos caso o vídeo não dispare 'ended'
       setTimeout(() => {
         document.getElementById('splashScreen').style.display = 'none';
         sessionStorage.setItem('splashShown', 'true');
         updateConnectionStatus();
         if (!localStorage.getItem('pwaDismissed') && deferredPrompt) {
           document.getElementById('modalInstall').style.display = 'flex';
+        } else {
+          document.getElementById('banReasonModal').style.display = 'flex';
         }
-      }, 5000); // Exibe por no máximo 5 segundos
+      }, 5000);
     }
 
-    // Verificar se o splash já foi mostrado na sessão
     if (!sessionStorage.getItem('splashShown')) {
       showSplashScreen();
     } else {
@@ -268,14 +443,7 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      if (!localStorage.getItem('pwaDismissed') && !sessionStorage.getItem('splashShown')) {
-        // Aguardar o splash terminar antes de mostrar o modal
-        setTimeout(() => {
-          if (!localStorage.getItem('pwaDismissed')) {
-            document.getElementById('modalInstall').style.display = 'flex';
-          }
-        }, 5000);
-      } else if (!localStorage.getItem('pwaDismissed')) {
+      if (!localStorage.getItem('pwaDismissed') && sessionStorage.getItem('splashShown')) {
         document.getElementById('modalInstall').style.display = 'flex';
       }
     });
@@ -284,22 +452,31 @@
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(() => {
         document.getElementById('modalInstall').style.display = 'none';
+        document.getElementById('banReasonModal').style.display = 'flex';
       });
     });
 
     document.getElementById('ficar').addEventListener('click', () => {
       localStorage.setItem('pwaDismissed', 'true');
       document.getElementById('modalInstall').style.display = 'none';
+      document.getElementById('banReasonModal').style.display = 'flex';
     });
 
     function updateConnectionStatus() {
       const online = navigator.onLine;
       document.getElementById('offlineScreen').style.display = online ? 'none' : 'flex';
       document.getElementById('mainFrame').style.display = online ? 'block' : 'none';
+      document.getElementById('banReasonModal').style.display = online ? 'flex' : 'none';
     }
 
     window.addEventListener('online', updateConnectionStatus);
     window.addEventListener('offline', updateConnectionStatus);
+
+    // Lógica do Modal de Banimento
+    document.getElementById('showBanReasons').addEventListener('click', () => {
+      const reasonsList = document.getElementById('banReasonsList');
+      reasonsList.style.display = reasonsList.style.display === 'none' ? 'block' : 'none';
+    });
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
