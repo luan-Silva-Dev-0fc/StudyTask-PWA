@@ -169,6 +169,121 @@
       margin: 0;
     }
 
+    /* Modal de Permissão de Notificações */
+    #notificationModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 20, 20, 0.9);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 90vw;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    #notificationModal h2 {
+      font-size: 5vw;
+      color: #ffffff;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    #notificationModal p {
+      font-size: 4vw;
+      color: #cccccc;
+      margin: 8px 0 16px;
+    }
+
+    #notificationModal button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 4vw;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    #allowNotifications {
+      background: #6200ea;
+      color: #ffffff;
+    }
+
+    #allowNotifications:hover {
+      background: #7f39fb;
+      transform: translateY(-2px);
+    }
+
+    #denyNotifications {
+      background: #333;
+      color: #ffffff;
+    }
+
+    #denyNotifications:hover {
+      background: #444;
+      transform: translateY(-2px);
+    }
+
+    /* Modal de Confirmação de Notificações */
+    #confirmationModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 20, 20, 0.9);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 90vw;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    #confirmationModal h2 {
+      font-size: 5vw;
+      color: #ffffff;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    #confirmationModal p {
+      font-size: 4vw;
+      color: #cccccc;
+      margin: 8px 0 16px;
+    }
+
+    #confirmationModal button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 4vw;
+      cursor: pointer;
+      background: #6200ea;
+      color: #ffffff;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    #confirmationModal button:hover {
+      background: #7f39fb;
+      transform: translateY(-2px);
+    }
+
     /* Fade in animation */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
@@ -177,9 +292,9 @@
 
     /* Responsividade */
     @media (min-width: 600px) {
-      #modalInstall h2 { font-size: 24px; }
-      #modalInstall p { font-size: 16px; }
-      #modalInstall button { font-size: 16px; padding: 12px 32px; }
+      #modalInstall h2, #notificationModal h2, #confirmationModal h2 { font-size: 24px; }
+      #modalInstall p, #notificationModal p, #confirmationModal p { font-size: 16px; }
+      #modalInstall button, #notificationModal button, #confirmationModal button { font-size: 16px; padding: 12px 32px; }
 
       #offlineScreen h1 { font-size: 24px; }
       #offlineScreen p { font-size: 16px; }
@@ -187,9 +302,9 @@
     }
 
     @media (max-width: 400px) {
-      #modalInstall h2 { font-size: 6vw; }
-      #modalInstall p { font-size: 4.5vw; }
-      #modalInstall button { font-size: 4.5vw; padding: 10px 20px; }
+      #modalInstall h2, #notificationModal h2, #confirmationModal h2 { font-size: 6vw; }
+      #modalInstall p, #notificationModal p, #confirmationModal p { font-size: 4.5vw; }
+      #modalInstall button, #notificationModal button, #confirmationModal button { font-size: 4.5vw; padding: 10px 20px; }
 
       #offlineScreen h1 { font-size: 6vw; }
       #offlineScreen p { font-size: 4.5vw; }
@@ -219,6 +334,21 @@
     </div>
   </div>
 
+  <!-- Modal de Permissão de Notificações -->
+  <div id="notificationModal">
+    <h2>Ativar Notificações?</h2>
+    <p>Receba lembretes e novidades do StudyTask para otimizar seus estudos!</p>
+    <button id="allowNotifications">Permitir</button>
+    <button id="denyNotifications">Não, obrigado</button>
+  </div>
+
+  <!-- Modal de Confirmação de Notificações -->
+  <div id="confirmationModal">
+    <h2>Notificações Ativadas!</h2>
+    <p>Você agora receberá lembretes e novidades do StudyTask.</p>
+    <button id="closeConfirmation">Entendido</button>
+  </div>
+
   <iframe id="mainFrame" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture" src="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/"></iframe>
 
   <script>
@@ -231,6 +361,8 @@
       document.getElementById('mainFrame').style.display = 'none';
       document.getElementById('offlineScreen').style.display = 'none';
       document.getElementById('modalInstall').style.display = 'none';
+      document.getElementById('notificationModal').style.display = 'none';
+      document.getElementById('confirmationModal').style.display = 'none';
 
       // Aguardar o vídeo terminar ou 5 segundos (o que for menor)
       video.addEventListener('ended', () => {
@@ -242,6 +374,10 @@
         if (!localStorage.getItem('pwaDismissed') && deferredPrompt) {
           document.getElementById('modalInstall').style.display = 'flex';
         }
+        // Mostrar modal de notificações após o splash, se não foi decidido
+        if (!localStorage.getItem('notificationDecision') && 'Notification' in window) {
+          document.getElementById('notificationModal').style.display = 'flex';
+        }
       });
 
       // Fallback: ocultar após 5 segundos caso o vídeo não dispare 'ended'
@@ -252,6 +388,9 @@
         if (!localStorage.getItem('pwaDismissed') && deferredPrompt) {
           document.getElementById('modalInstall').style.display = 'flex';
         }
+        if (!localStorage.getItem('notificationDecision') && 'Notification' in window) {
+          document.getElementById('notificationModal').style.display = 'flex';
+        }
       }, 6000); // Exibe por no máximo 5 segundos
     }
 
@@ -261,6 +400,9 @@
     } else {
       document.getElementById('splashScreen').style.display = 'none';
       updateConnectionStatus();
+      if (!localStorage.getItem('notificationDecision') && 'Notification' in window && Notification.permission === 'default') {
+        document.getElementById('notificationModal').style.display = 'flex';
+      }
     }
 
     let deferredPrompt;
@@ -304,6 +446,60 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('SW registrado'));
+    }
+
+    // Lógica de Notificações com Modal
+    if ('Notification' in window && 'serviceWorker' in navigator) {
+      const notificationModal = document.getElementById('notificationModal');
+      const confirmationModal = document.getElementById('confirmationModal');
+      const allowButton = document.getElementById('allowNotifications');
+      const denyButton = document.getElementById('denyNotifications');
+      const closeConfirmationButton = document.getElementById('closeConfirmation');
+
+      // Mostrar o modal de notificações apenas se nenhuma decisão foi tomada
+      if (!localStorage.getItem('notificationDecision') && Notification.permission === 'default') {
+        notificationModal.style.display = 'flex';
+      }
+
+      allowButton.addEventListener('click', () => {
+        Notification.requestPermission().then(async (permission) => {
+          notificationModal.style.display = 'none'; // Fecha o modal de permissão
+          localStorage.setItem('notificationDecision', 'made'); // Marca que a decisão foi tomada
+          if (permission === 'granted') {
+            console.log('🔔 Notificações permitidas.');
+            // Mostrar modal de confirmação
+            confirmationModal.style.display = 'flex';
+            const registration = await navigator.serviceWorker.ready;
+            if ('periodicSync' in registration) {
+              try {
+                const tags = await registration.periodicSync.getTags();
+                if (!tags.includes('notificar-novidades')) {
+                  await registration.periodicSync.register('notificar-novidades', {
+                    minInterval: 3 * 60 * 60 * 1000 // 3 horas
+                  });
+                  console.log('✅ periodicSync registrado!');
+                }
+              } catch (err) {
+                console.log('⚠️ Erro ao registrar periodicSync:', err);
+              }
+            } else {
+              console.log('❌ periodicSync não suportado neste navegador.');
+            }
+          } else {
+            console.log('❌ Permissão de notificação negada.');
+          }
+        });
+      });
+
+      denyButton.addEventListener('click', () => {
+        localStorage.setItem('notificationDecision', 'made');
+        notificationModal.style.display = 'none';
+        console.log('❌ Permissão de notificação negada pelo usuário.');
+      });
+
+      closeConfirmationButton.addEventListener('click', () => {
+        confirmationModal.style.display = 'none';
+      });
     }
   </script>
 </body>
