@@ -24,26 +24,27 @@ self.addEventListener('activate', (event) => {
     const cacheWhitelist = [CACHE_NAME, DYNAMIC_CACHE];
     const cacheNames = await caches.keys();
     await Promise.all(
-      cacheNames.map(name => {
+      cacheNames.map((name) => {
         if (!cacheWhitelist.includes(name)) {
           return caches.delete(name);
         }
       })
     );
-
-    try {
-      if ('periodicSync' in registration) {
-        await registration.periodicSync.register('notificar-novidades', {
+    self.clients.claim();
+    // Tentando registrar periodicSync, ou fallback com intervalo
+    if ('periodicSync' in self.registration) {
+      try {
+        await self.registration.periodicSync.register('notificar-novidades', {
           minInterval: 60 * 1000 // 1 minuto
         });
-      } else {
-        iniciarNotificacoesComSetTimeout(); // Fallback
+        console.log('Periodic Sync registrado');
+      } catch (e) {
+        console.warn('Falha ao registrar periodicSync:', e);
+        iniciarNotificacoesComIntervalo(); // Fallback
       }
-    } catch (e) {
-      iniciarNotificacoesComSetTimeout(); // Fallback em erro
+    } else {
+      iniciarNotificacoesComIntervalo(); // Fallback se `periodicSync` não for suportado
     }
-
-    self.clients.claim();
   })());
 });
 
@@ -70,16 +71,6 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
-
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-tasks') {
-    event.waitUntil(syncTasks());
-  }
-});
-
-async function syncTasks() {
-  console.log('[ServiceWorker] Sincronizando tarefas...');
-}
 
 self.addEventListener('push', (event) => {
   const data = event.data?.json() || {
@@ -109,6 +100,7 @@ self.addEventListener('periodicsync', (event) => {
   }
 });
 
+// Função que envia a notificação
 async function enviarNotificacaoPeriodica() {
   await self.registration.showNotification('Atualizações de Atividade', {
     body: 'Veja se há novas atualizações de atividade.',
@@ -117,11 +109,14 @@ async function enviarNotificacaoPeriodica() {
   });
 }
 
-// Fallback com setTimeout (não confiável em segundo plano)
-function iniciarNotificacoesComSetTimeout() {
-  function notificarLoop() {
+// Fallback com setInterval (não tão confiável para segundo plano, mas vai funcionar enquanto o SW estiver ativo)
+function iniciarNotificacoesComIntervalo() {
+  setInterval(() => {
     enviarNotificacaoPeriodica();
-    setTimeout(notificarLoop, 60 * 1000); // 1 minuto
-  }
-  notificarLoop();
+  }, 60 * 1000); // 1 minuto
+}
+
+// Função de sincronização manual, que pode ser chamada para forçar notificações
+function forçarNotificacao() {
+  enviarNotificacaoPeriodica();
 }
