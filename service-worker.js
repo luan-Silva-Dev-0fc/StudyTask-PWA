@@ -20,32 +20,40 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cacheWhitelist = [CACHE_NAME, DYNAMIC_CACHE];
-      const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames.map(name => {
-          if (!cacheWhitelist.includes(name)) {
-            return caches.delete(name);
-          }
-        })
-      );
-      self.clients.claim();
-      
-      // Inicia notificações automáticas recorrentes
-      enviarNotificacaoPeriodica();
-    })()
-  );
+  event.waitUntil((async () => {
+    const cacheWhitelist = [CACHE_NAME, DYNAMIC_CACHE];
+    const cacheNames = await caches.keys();
+    await Promise.all(
+      cacheNames.map(name => {
+        if (!cacheWhitelist.includes(name)) {
+          return caches.delete(name);
+        }
+      })
+    );
+
+    try {
+      if ('periodicSync' in registration) {
+        await registration.periodicSync.register('notificar-novidades', {
+          minInterval: 60 * 1000 // 1 minuto
+        });
+      } else {
+        iniciarNotificacoesComSetTimeout(); // Fallback
+      }
+    } catch (e) {
+      iniciarNotificacoesComSetTimeout(); // Fallback em erro
+    }
+
+    self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  
+
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
-      
+
       return fetch(request)
         .then(response => {
           const responseClone = response.clone();
@@ -73,14 +81,13 @@ async function syncTasks() {
   console.log('[ServiceWorker] Sincronizando tarefas...');
 }
 
-// Push Notification (caso seja usado depois)
 self.addEventListener('push', (event) => {
   const data = event.data?.json() || {
     title: 'StudyTask',
     body: 'Você tem tarefas pendentes!',
     icon: 'icon-192.png'
   };
-  
+
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -90,20 +97,31 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// Mensagem entre app e SW
 self.addEventListener('message', (event) => {
   if (event.data === 'force-update') {
     self.skipWaiting();
   }
 });
 
-// Notificação automática a cada 1 hora
-function enviarNotificacaoPeriodica() {
-  self.registration.showNotification('Atualizações de Atividade', {
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'notificar-novidades') {
+    event.waitUntil(enviarNotificacaoPeriodica());
+  }
+});
+
+async function enviarNotificacaoPeriodica() {
+  await self.registration.showNotification('Atualizações de Atividade', {
     body: 'Veja se há novas atualizações de atividade.',
     icon: 'icon-192.png',
     badge: 'icon-192.png'
   });
-  
-setTimeout(enviarNotificacaoPeriodica, 8 * 60 * 60 * 1000); // 8 horas
+}
+
+// Fallback com setTimeout (não confiável em segundo plano)
+function iniciarNotificacoesComSetTimeout() {
+  function notificarLoop() {
+    enviarNotificacaoPeriodica();
+    setTimeout(notificarLoop, 60 * 1000); // 1 minuto
+  }
+  notificarLoop();
 }
