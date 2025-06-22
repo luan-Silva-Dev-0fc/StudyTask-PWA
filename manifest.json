@@ -84,5 +84,7 @@
 
   "edge_side_panel": {
     "preferred_width": 400
-  }
+  },
+
+  "gcm_sender_id": "103953800507"
 }
