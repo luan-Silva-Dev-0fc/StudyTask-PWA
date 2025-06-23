@@ -33,20 +33,6 @@ self.addEventListener('activate', (event) => {
     );
 
     self.clients.claim();
-
-    if ('periodicSync' in self.registration) {
-      try {
-        await self.registration.periodicSync.register('notificar-novidades', {
-          minInterval: 60 * 1000
-        });
-        console.log('Periodic Sync registrado');
-      } catch (e) {
-        console.warn('Falha ao registrar periodicSync:', e);
-        iniciarNotificacoesComIntervalo();
-      }
-    } else {
-      iniciarNotificacoesComIntervalo();
-    }
   })());
 });
 
@@ -79,26 +65,6 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'notificar-novidades') {
-    event.waitUntil(enviarNotificacaoPeriodica());
-  }
-});
-
-async function enviarNotificacaoPeriodica() {
-  await self.registration.showNotification('Atualizações de Atividade', {
-    body: 'Veja se há novas atualizações de atividade.',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png'
-  });
-}
-
-function iniciarNotificacoesComIntervalo() {
-  setInterval(() => {
-    enviarNotificacaoPeriodica();
-  }, 60 * 1000);
-}
 
 self.addEventListener('push', (event) => {
   const data = event.data?.json() || {
