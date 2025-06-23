@@ -12,7 +12,6 @@
   <meta property="og:url" content="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/" />
   <meta property="og:image" content="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/path/to/preview-image.jpg" />
   <meta property="og:image:alt" content="Logo do StudyTask" />
-  <!-- Fim dos metadados Open Graph -->
   <style>
     html, body {
       margin: 0;
@@ -31,14 +30,12 @@
       display: block;
     }
 
-    /* ANIMAÇÃO DE GRADIENTE */
     @keyframes backgroundGradient {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    /* Modal de Abertura com Vídeo */
     #splashScreen {
       position: fixed;
       top: 0;
@@ -59,11 +56,10 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover; /* Garante que o vídeo cubra a tela sem distorção */
-      object-position: center; /* Centraliza o conteúdo do vídeo */
+      object-fit: cover;
+      object-position: center;
     }
 
-    /* Modal de Instalação */
     #modalInstall {
       position: fixed;
       top: 50%;
@@ -127,7 +123,6 @@
       transform: translateY(-2px);
     }
 
-    /* Modal Offline */
     #offlineScreen {
       position: fixed;
       top: 0;
@@ -169,7 +164,6 @@
       margin: 0;
     }
 
-    /* Modal de Permissão de Notificações */
     #notificationModal {
       position: fixed;
       top: 50%;
@@ -233,7 +227,6 @@
       transform: translateY(-2px);
     }
 
-    /* Modal de Confirmação de Notificações */
     #confirmationModal {
       position: fixed;
       top: 50%;
@@ -284,18 +277,15 @@
       transform: translateY(-2px);
     }
 
-    /* Fade in animation */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* Responsividade */
     @media (min-width: 600px) {
       #modalInstall h2, #notificationModal h2, #confirmationModal h2 { font-size: 24px; }
       #modalInstall p, #notificationModal p, #confirmationModal p { font-size: 16px; }
       #modalInstall button, #notificationModal button, #confirmationModal button { font-size: 16px; padding: 12px 32px; }
-
       #offlineScreen h1 { font-size: 24px; }
       #offlineScreen p { font-size: 16px; }
       #offlineScreen .box { padding: 32px; max-width: 500px; }
@@ -305,14 +295,12 @@
       #modalInstall h2, #notificationModal h2, #confirmationModal h2 { font-size: 6vw; }
       #modalInstall p, #notificationModal p, #confirmationModal p { font-size: 4.5vw; }
       #modalInstall button, #notificationModal button, #confirmationModal button { font-size: 4.5vw; padding: 10px 20px; }
-
       #offlineScreen h1 { font-size: 6vw; }
       #offlineScreen p { font-size: 4.5vw; }
     }
   </style>
 </head>
 <body>
-  <!-- Modal de Abertura com Vídeo -->
   <div id="splashScreen">
     <video autoplay muted playsinline>
       <source src="splash.mp4" type="video/mp4" />
@@ -334,7 +322,6 @@
     </div>
   </div>
 
-  <!-- Modal de Permissão de Notificações -->
   <div id="notificationModal">
     <h2>Ativar Notificações?</h2>
     <p>Receba lembretes e novidades do StudyTask para otimizar seus estudos!</p>
@@ -342,7 +329,6 @@
     <button id="denyNotifications">Não, obrigado</button>
   </div>
 
-  <!-- Modal de Confirmação de Notificações -->
   <div id="confirmationModal">
     <h2>Notificações Ativadas!</h2>
     <p>Você agora receberá lembretes e novidades do StudyTask.</p>
@@ -352,35 +338,43 @@
   <iframe id="mainFrame" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture" src="https://luan-silva-dev-0fc.github.io/Sistema-De-Banimento-/"></iframe>
 
   <script>
-    // Lógica do Splash Screen
+    // VAPID Public Key (cleaned of PEM headers and newlines)
+    const VAPID_PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElKPm0z1NjU+8syBRzm1QKyEADDeVZnxp3qNeXSaZBLm2e1KAAZ7TGFqRmogZQWdJlLjoYnopwS7nOBUdmSz4nw==";
+
+    // Convert base64 VAPID key to Uint8Array
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    }
+
+    // Splash Screen Logic
     function showSplashScreen() {
       const video = document.querySelector('#splashScreen video');
-      // Mostrar o splash screen
       document.getElementById('splashScreen').style.display = 'flex';
-      // Ocultar outros elementos durante o splash
       document.getElementById('mainFrame').style.display = 'none';
       document.getElementById('offlineScreen').style.display = 'none';
       document.getElementById('modalInstall').style.display = 'none';
       document.getElementById('notificationModal').style.display = 'none';
       document.getElementById('confirmationModal').style.display = 'none';
 
-      // Aguardar o vídeo terminar ou 5 segundos (o que for menor)
       video.addEventListener('ended', () => {
         document.getElementById('splashScreen').style.display = 'none';
         sessionStorage.setItem('splashShown', 'true');
-        // Restaurar visibilidade com base no estado da conexão
         updateConnectionStatus();
-        // Verificar se deve mostrar o modal de instalação
         if (!localStorage.getItem('pwaDismissed') && deferredPrompt) {
           document.getElementById('modalInstall').style.display = 'flex';
         }
-        // Mostrar modal de notificações após o splash, se não foi decidido
         if (!localStorage.getItem('notificationDecision') && 'Notification' in window) {
           document.getElementById('notificationModal').style.display = 'flex';
         }
       });
 
-      // Fallback: ocultar após 5 segundos caso o vídeo não dispare 'ended'
       setTimeout(() => {
         document.getElementById('splashScreen').style.display = 'none';
         sessionStorage.setItem('splashShown', 'true');
@@ -391,10 +385,9 @@
         if (!localStorage.getItem('notificationDecision') && 'Notification' in window) {
           document.getElementById('notificationModal').style.display = 'flex';
         }
-      }, 6000); // Exibe por no máximo 5 segundos
+      }, 6000);
     }
 
-    // Verificar se o splash já foi mostrado na sessão
     if (!sessionStorage.getItem('splashShown')) {
       showSplashScreen();
     } else {
@@ -411,7 +404,6 @@
       e.preventDefault();
       deferredPrompt = e;
       if (!localStorage.getItem('pwaDismissed') && !sessionStorage.getItem('splashShown')) {
-        // Aguardar o splash terminar antes de mostrar o modal
         setTimeout(() => {
           if (!localStorage.getItem('pwaDismissed')) {
             document.getElementById('modalInstall').style.display = 'flex';
@@ -443,39 +435,57 @@
     window.addEventListener('online', updateConnectionStatus);
     window.addEventListener('offline', updateConnectionStatus);
 
-    if ('serviceWorker' in navigator) {
+    // Service Worker and Notification Logic
+    if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('SW registrado'));
-    }
+        .then(() => console.log('SW registrado'))
+        .catch((error) => console.error('Erro ao registrar Service Worker:', error));
 
-    // Lógica de Notificações com Modal
-    if ('Notification' in window && 'serviceWorker' in navigator) {
       const notificationModal = document.getElementById('notificationModal');
       const confirmationModal = document.getElementById('confirmationModal');
       const allowButton = document.getElementById('allowNotifications');
       const denyButton = document.getElementById('denyNotifications');
       const closeConfirmationButton = document.getElementById('closeConfirmation');
 
-      // Mostrar o modal de notificações apenas se nenhuma decisão foi tomada
       if (!localStorage.getItem('notificationDecision') && Notification.permission === 'default') {
         notificationModal.style.display = 'flex';
       }
 
-      allowButton.addEventListener('click', () => {
-        Notification.requestPermission().then(async (permission) => {
-          notificationModal.style.display = 'none'; // Fecha o modal de permissão
-          localStorage.setItem('notificationDecision', 'made'); // Marca que a decisão foi tomada
+      allowButton.addEventListener('click', async () => {
+        try {
+          const permission = await Notification.requestPermission();
+          notificationModal.style.display = 'none';
+          localStorage.setItem('notificationDecision', 'made');
+
           if (permission === 'granted') {
             console.log('🔔 Notificações permitidas.');
-            // Mostrar modal de confirmação
-            confirmationModal.style.display = 'flex';
             const registration = await navigator.serviceWorker.ready;
+
+            // Subscribe to push notifications
+            const subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+            });
+
+            // Send subscription to backend
+            await fetch('http://localhost:8000/subscribe', {
+              method: 'POST',
+              body: JSON.stringify(subscription),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            console.log('✅ Inscrição enviada para o backend com sucesso.');
+            confirmationModal.style.display = 'flex';
+
+            // Optional: Register periodic sync if supported
             if ('periodicSync' in registration) {
               try {
                 const tags = await registration.periodicSync.getTags();
                 if (!tags.includes('notificar-novidades')) {
                   await registration.periodicSync.register('notificar-novidades', {
-                    minInterval: 3 * 60 * 60 * 1000 // 3 horas
+                    minInterval: 3 * 60 * 60 * 1000 // 3 hours
                   });
                   console.log('✅ periodicSync registrado!');
                 }
@@ -488,7 +498,9 @@
           } else {
             console.log('❌ Permissão de notificação negada.');
           }
-        });
+        } catch (error) {
+          console.error('Erro ao configurar notificações:', error);
+        }
       });
 
       denyButton.addEventListener('click', () => {
