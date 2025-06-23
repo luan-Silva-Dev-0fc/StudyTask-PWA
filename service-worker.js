@@ -23,6 +23,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const cacheWhitelist = [CACHE_NAME, DYNAMIC_CACHE];
     const cacheNames = await caches.keys();
+    
     await Promise.all(
       cacheNames.map((name) => {
         if (!cacheWhitelist.includes(name)) {
@@ -30,20 +31,21 @@ self.addEventListener('activate', (event) => {
         }
       })
     );
+
     self.clients.claim();
-    // Tentando registrar periodicSync, ou fallback com intervalo
+
     if ('periodicSync' in self.registration) {
       try {
         await self.registration.periodicSync.register('notificar-novidades', {
-          minInterval: 60 * 1000 // 1 minuto
+          minInterval: 60 * 1000
         });
         console.log('Periodic Sync registrado');
       } catch (e) {
         console.warn('Falha ao registrar periodicSync:', e);
-        iniciarNotificacoesComIntervalo(); // Fallback
+        iniciarNotificacoesComIntervalo();
       }
     } else {
-      iniciarNotificacoesComIntervalo(); // Fallback se `periodicSync` não for suportado
+      iniciarNotificacoesComIntervalo();
     }
   })());
 });
@@ -72,22 +74,6 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-self.addEventListener('push', (event) => {
-  const data = event.data?.json() || {
-    title: 'StudyTask',
-    body: 'Você tem tarefas pendentes!',
-    icon: 'icon-192.png'
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: data.icon,
-      badge: 'icon-192.png'
-    })
-  );
-});
-
 self.addEventListener('message', (event) => {
   if (event.data === 'force-update') {
     self.skipWaiting();
@@ -100,7 +86,6 @@ self.addEventListener('periodicsync', (event) => {
   }
 });
 
-// Função que envia a notificação
 async function enviarNotificacaoPeriodica() {
   await self.registration.showNotification('Atualizações de Atividade', {
     body: 'Veja se há novas atualizações de atividade.',
@@ -109,14 +94,24 @@ async function enviarNotificacaoPeriodica() {
   });
 }
 
-// Fallback com setInterval (não tão confiável para segundo plano, mas vai funcionar enquanto o SW estiver ativo)
 function iniciarNotificacoesComIntervalo() {
   setInterval(() => {
     enviarNotificacaoPeriodica();
-  }, 60 * 1000); // 1 minuto
+  }, 60 * 1000);
 }
 
-// Função de sincronização manual, que pode ser chamada para forçar notificações
-function forçarNotificacao() {
-  enviarNotificacaoPeriodica();
-}
+self.addEventListener('push', (event) => {
+  const data = event.data?.json() || {
+    title: 'Notificação do PWA!',
+    body: 'Esta notificação foi enviada via backend Python!',
+    icon: 'icon-192.png'
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: 'icon-192.png'
+    })
+  );
+});
