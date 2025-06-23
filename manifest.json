@@ -86,5 +86,28 @@
     "preferred_width": 400
   },
 
-  "gcm_sender_id": "103953800507"
+  "gcm_sender_id": "103953800507",
+
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+
+  "display_override": ["standalone", "window-controls-overlay"],
+
+  "capture_links": "existing-client-navigate",
+
+  "file_handlers": [],
+  
+  "protocol_handlers": [],
+  
+  "share_target": {
+    "action": "/compartilhar",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "titulo",
+      "text": "mensagem",
+      "url": "link"
+    }
+  }
 }
